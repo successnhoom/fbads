@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 224 71% 4%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 71% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71% 4%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 9% 46%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 224 71% 4%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 221 83% 53%;
+    --chart-1: 221 83% 53%;
+    --chart-2: 160 84% 39%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 0 84% 60%;
+    --chart-5: 262 83% 58%;
+    --radius: 0.6rem;
+    --sidebar-background: 224 71% 4%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 221 83% 53%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 224 40% 12%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 224 40% 12%;
+    --sidebar-ring: 221 83% 53%;
+  }
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Noto Sans Thai", "Inter", system-ui, sans-serif;
+  }
+}
+
+.prose-report h2 { @apply mt-6 mb-2 text-lg font-semibold; }
+.prose-report h3 { @apply mt-4 mb-1 font-semibold; }
+.prose-report p { @apply my-2 leading-relaxed; }
+.prose-report ul { @apply my-2 list-disc pl-6 space-y-1; }
+.prose-report ol { @apply my-2 list-decimal pl-6 space-y-1; }
+.prose-report table { @apply my-3 w-full text-sm border-collapse; }
+.prose-report th { @apply border bg-muted px-2 py-1 text-left font-medium; }
+.prose-report td { @apply border px-2 py-1; }
+.prose-report strong { @apply font-semibold; }

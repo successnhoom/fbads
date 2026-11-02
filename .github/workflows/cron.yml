@@ -1,0 +1,20 @@
+# ทางเลือกสำหรับคนที่ไม่ได้ deploy บน Vercel: ให้ GitHub Actions เรียก cron endpoint แทน
+# ตั้ง secrets: APP_URL (เช่น https://your-app.example.com) และ CRON_SECRET
+name: AI Ads cron
+on:
+  schedule:
+    - cron: "0 2 * * *"   # 02:00 UTC = 09:00 ไทย – รันปรับงบ + รายงานรายวัน
+    - cron: "0 3 * * 1"   # วันจันทร์ – รายงานรายสัปดาห์
+  workflow_dispatch:
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    if: ${{ vars.APP_URL != '' }}
+    steps:
+      - name: optimize
+        run: curl -fsS -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "${{ vars.APP_URL }}/api/cron/optimize"
+      - name: daily report
+        run: curl -fsS -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "${{ vars.APP_URL }}/api/cron/report?type=daily"
+      - name: weekly report
+        if: github.event.schedule == '0 3 * * 1'
+        run: curl -fsS -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "${{ vars.APP_URL }}/api/cron/report?type=weekly"

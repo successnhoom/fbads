@@ -1,0 +1,131 @@
+// Prisma schema – ใช้ SQLite เป็นค่าเริ่มต้น (ไม่ต้องติดตั้งอะไรเพิ่ม)
+// หากจะใช้ PostgreSQL (เช่น Neon / Supabase) เปลี่ยน provider เป็น "postgresql"
+// และตั้ง DATABASE_URL ใน .env – schema นี้ไม่ใช้ type ที่ขึ้นกับ DB (JSON เก็บเป็น String)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// บัญชีโฆษณา Facebook ที่เชื่อมต่อแล้ว
+model AdAccount {
+  id              String   @id // act_123456789
+  name            String
+  currency        String   @default("THB")
+  timezone        String   @default("Asia/Bangkok")
+  accessTokenEnc  String   // token ที่เข้ารหัสด้วย APP_SECRET_KEY
+  tokenExpiresAt  DateTime?
+  businessName    String?
+  isActive        Boolean  @default(false)
+  pageId          String?
+  pixelId         String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  settings   AutomationSettings?
+  actions    ActionLog[]
+  reports    Report[]
+  audiences  AudienceSuggestion[]
+  snapshots  InsightSnapshot[]
+  plans      CampaignPlan[]
+}
+
+/// การตั้งค่าออโต้เมชันต่อบัญชี
+model AutomationSettings {
+  accountId          String  @id
+  account            AdAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  enabled            Boolean @default(false)
+  mode               String  @default("approve") // "auto" = ทำทันที, "approve" = รอคนอนุมัติ
+  dailyBudgetCap     Float   @default(1000)      // งบรวมสูงสุดต่อวัน (สกุลเงินบัญชี)
+  targetCpa          Float?                      // เป้าหมายต้นทุนต่อผลลัพธ์
+  targetRoas         Float?                      // เป้าหมาย ROAS
+  maxChangePct       Int     @default(20)        // ปรับงบได้ไม่เกินกี่ % ต่อรอบ
+  minSpendToJudge    Float   @default(300)       // ใช้จ่ายขั้นต่ำก่อนตัดสิน ad set
+  minAdsetBudget     Float   @default(100)       // งบ ad set ต่ำสุด
+  maxAdsetBudget     Float   @default(5000)      // งบ ad set สูงสุด
+  lookbackDays       Int     @default(7)
+  pauseWhenCpaOver   Float?                      // หยุดเมื่อ CPA เกินเท่านี้ (เท่าของ target)
+  notifyWebhookUrl   String?
+  updatedAt          DateTime @updatedAt
+}
+
+/// บันทึกทุก action ที่ AI เสนอ/ทำ
+model ActionLog {
+  id          String   @id @default(cuid())
+  accountId   String
+  account     AdAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  runId       String?
+  entityType  String   // campaign | adset | ad
+  entityId    String
+  entityName  String
+  actionType  String   // scale_up | scale_down | pause | resume | keep | create | update_targeting
+  beforeJson  String?  // JSON string
+  afterJson   String?  // JSON string
+  reason      String
+  confidence  Float?
+  status      String   @default("pending") // pending | applied | rejected | failed | skipped
+  error       String?
+  createdAt   DateTime @default(now())
+  appliedAt   DateTime?
+
+  @@index([accountId, status])
+}
+
+/// รายงานที่ AI สร้าง
+model Report {
+  id         String   @id @default(cuid())
+  accountId  String
+  account    AdAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  type       String   // daily | weekly | custom
+  periodFrom String
+  periodTo   String
+  title      String
+  markdown   String
+  metricsJson String  // JSON สรุปตัวเลข
+  createdAt  DateTime @default(now())
+
+  @@index([accountId, createdAt])
+}
+
+/// กลุ่มเป้าหมายที่ AI แนะนำ
+model AudienceSuggestion {
+  id            String   @id @default(cuid())
+  accountId     String
+  account       AdAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  name          String
+  rationale     String
+  targetingJson String   // targeting spec ที่ส่งให้ Meta ได้เลย
+  estimateJson  String?  // reach estimate
+  brief         String
+  createdAt     DateTime @default(now())
+}
+
+/// snapshot ตัวเลขรายวัน (ใช้ดูเทรนด์)
+model InsightSnapshot {
+  id         String   @id @default(cuid())
+  accountId  String
+  account    AdAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  date       String   // YYYY-MM-DD
+  level      String   // account | campaign | adset
+  entityId   String
+  dataJson   String
+  createdAt  DateTime @default(now())
+
+  @@unique([accountId, date, level, entityId])
+}
+
+/// แผนแคมเปญที่ AI วาง
+model CampaignPlan {
+  id          String   @id @default(cuid())
+  accountId   String
+  account     AdAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  brief       String
+  planJson    String
+  status      String   @default("draft") // draft | launched | failed
+  launchedIds String?  // JSON ids ที่สร้างใน Meta
+  createdAt   DateTime @default(now())
+}

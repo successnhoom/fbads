@@ -1,0 +1,7 @@
+{
+  "crons": [
+    { "path": "/api/cron/optimize", "schedule": "0 2 * * *" },
+    { "path": "/api/cron/report?type=daily", "schedule": "30 2 * * *" },
+    { "path": "/api/cron/report?type=weekly", "schedule": "0 3 * * 1" }
+  ]
+}
