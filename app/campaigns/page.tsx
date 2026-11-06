@@ -50,7 +50,7 @@ export default function CampaignsPage() {
 
       <div className="mb-4 flex gap-1 rounded-md bg-muted p-1 text-sm w-fit">
         {(["campaign", "adset", "ad"] as const).map((t) => (
-          <button key={t} onClick={() => setTab(t)} className={`rounded px-3 py-1 ${tab === t ? "bg-white shadow" : "text-muted-foreground"}`}>
+          <button key={t} onClick={() => setTab(t)} className={`rounded-lg px-3 py-1 ${tab === t ? "bg-primary text-white shadow" : "text-muted-foreground"}`}>
             {t === "campaign" ? `แคมเปญ (${s.campaigns.length})` : t === "adset" ? `Ad set (${s.adsets.length})` : `โฆษณา (${s.ads.length})`}
           </button>
         ))}

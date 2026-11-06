@@ -12,7 +12,7 @@ export function MetricCard({ label, value, change, invert, hint }: { label: stri
       <div className="text-xs text-muted-foreground">{label}</div>
       <div className="mt-1 text-xl font-semibold">{value}</div>
       {change !== undefined && Number.isFinite(change) && (
-        <div className={cn("mt-1 flex items-center gap-1 text-xs", good ? "text-emerald-600" : change === 0 ? "text-muted-foreground" : "text-red-600")}>
+        <div className={cn("mt-1 flex items-center gap-1 text-xs", good ? "text-emerald-400" : change === 0 ? "text-muted-foreground" : "text-rose-400")}>
           {change >= 0 ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
           {Math.abs(change).toFixed(1)}% เทียบช่วงก่อน
         </div>

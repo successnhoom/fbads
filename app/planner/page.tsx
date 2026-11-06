@@ -128,7 +128,7 @@ export default function PlannerPage() {
                       <Button variant="ghost" onClick={() => { setCurrent(null); setLaunched(null); }}>ปิด</Button>
                     </div>
                   ) : (
-                    <div className="rounded-md border border-emerald-200 bg-emerald-50 p-3 text-xs">
+                    <div className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 p-3 text-xs">
                       ✅ สร้างแล้ว – Campaign ID {launched.campaignId}
                       <ul className="mt-1 list-disc pl-5">{launched.adsets.map((a) => <li key={a.id}>{a.name}: ad set {a.id}, โฆษณา {a.ads.length} ชิ้น{a.warnings.length ? ` – ⚠ ${a.warnings.join("; ")}` : ""}</li>)}</ul>
                       <a className="underline" target="_blank" rel="noreferrer" href={`https://adsmanager.facebook.com/adsmanager/manage/campaigns?selected_campaign_ids=${launched.campaignId}`}>เปิดใน Ads Manager</a>

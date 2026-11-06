@@ -257,6 +257,15 @@ export class MetaClient {
     return this.post<{ success: boolean }>(entityId, { daily_budget: toMinor(amount, currency) });
   }
 
+  updateName(entityId: string, name: string) {
+    return this.post<{ success: boolean }>(entityId, { name });
+  }
+
+  /** ลบ campaign / ad set / ad (Meta จะตั้งสถานะเป็น DELETED) */
+  deleteEntity(entityId: string) {
+    return this.delete<{ success: boolean }>(entityId);
+  }
+
   updateTargeting(adsetId: string, targeting: TargetingSpec) {
     return this.post<{ success: boolean }>(adsetId, { targeting });
   }

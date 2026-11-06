@@ -128,7 +128,7 @@ function SettingsInner() {
                 {meta?.pixels.map((p) => <option key={p.id} value={p.id}>{p.name} ({p.id})</option>)}
               </Select>
             </Field>
-            {!meta?.pages.length && <p className="text-xs text-amber-700 md:col-span-2">ไม่พบเพจ – token อาจไม่มีสิทธิ์ pages_show_list หรือพิมพ์ page ID เองได้ในช่องด้านล่าง</p>}
+            {!meta?.pages.length && <p className="text-xs text-amber-300 md:col-span-2">ไม่พบเพจ – token อาจไม่มีสิทธิ์ pages_show_list หรือพิมพ์ page ID เองได้ในช่องด้านล่าง</p>}
             <Field label="หรือพิมพ์ Page ID เอง"><Input value={pageId} onChange={(e) => setPageId(e.target.value)} placeholder="1234567890" /></Field>
             <Field label="หรือพิมพ์ Pixel ID เอง"><Input value={pixelId} onChange={(e) => setPixelId(e.target.value)} placeholder="1234567890" /></Field>
             <div className="md:col-span-2"><Button onClick={savePagePixel}>บันทึก</Button></div>

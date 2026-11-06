@@ -139,7 +139,7 @@ export default function AutomationPage() {
                       <Td className="font-medium">{a.entityName}<div className="text-xs text-muted-foreground">{a.entityType}</div></Td>
                       <Td><ActionBadge type={a.actionType} /></Td>
                       <Td className="whitespace-nowrap text-xs">{b.dailyBudget != null && af.dailyBudget != null && b.dailyBudget !== af.dailyBudget ? `${b.dailyBudget} → ${af.dailyBudget}` : ""}</Td>
-                      <Td className="max-w-md text-xs">{a.reason}{a.error && <div className="text-red-600">{a.error}</div>}</Td>
+                      <Td className="max-w-md text-xs">{a.reason}{a.error && <div className="text-rose-300">{a.error}</div>}</Td>
                       <Td className="text-xs">{a.confidence != null ? `${Math.round(a.confidence * 100)}%` : ""}</Td>
                       <Td><StateBadge status={a.status} /></Td>
                       <Td>

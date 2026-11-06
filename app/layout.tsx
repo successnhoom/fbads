@@ -18,9 +18,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen">
         <div className="flex min-h-screen">
           <Sidebar />
-          <main className="flex-1 overflow-x-hidden bg-slate-50 p-4 md:p-8">{children}</main>
+          <main className="flex-1 overflow-x-hidden p-4 md:p-8">{children}</main>
         </div>
-        <Toaster richColors position="top-right" />
+        <Toaster richColors theme="dark" position="top-right" />
       </body>
     </html>
   );

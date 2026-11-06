@@ -115,7 +115,7 @@ function SegmentCard({ s }: { s: ResolvedSegment }) {
           {s.interests.map((i) => <Badge key={i.id} variant="muted">{i.name}{i.audience_size_upper_bound ? ` (${fmtNum(i.audience_size_upper_bound / 1e6, 1)}M)` : ""}</Badge>)}
           {!s.interests.length && <Badge variant="warning">Broad / Advantage+ audience</Badge>}
         </div>
-        {!!s.missingKeywords.length && <p className="text-xs text-amber-700">ไม่พบ interest ใน Meta: {s.missingKeywords.join(", ")}</p>}
+        {!!s.missingKeywords.length && <p className="text-xs text-amber-300">ไม่พบ interest ใน Meta: {s.missingKeywords.join(", ")}</p>}
         <details className="text-xs">
           <summary className="cursor-pointer text-muted-foreground">targeting spec (JSON)</summary>
           <pre className="mt-1 overflow-x-auto rounded bg-muted p-2">{JSON.stringify(s.targeting, null, 2)}</pre>

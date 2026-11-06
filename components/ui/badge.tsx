@@ -1,12 +1,13 @@
 import { cn } from "@/lib/utils";
 
 const styles: Record<string, string> = {
-  default: "bg-primary/10 text-primary",
-  success: "bg-emerald-100 text-emerald-800",
-  warning: "bg-amber-100 text-amber-800",
-  danger: "bg-red-100 text-red-800",
-  muted: "bg-muted text-muted-foreground",
-  purple: "bg-violet-100 text-violet-800",
+  default: "bg-violet-500/15 text-violet-300 ring-1 ring-violet-400/30",
+  success: "bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-400/30",
+  warning: "bg-amber-500/15 text-amber-300 ring-1 ring-amber-400/30",
+  danger: "bg-rose-500/15 text-rose-300 ring-1 ring-rose-400/30",
+  muted: "bg-white/5 text-muted-foreground ring-1 ring-white/10",
+  purple: "bg-fuchsia-500/15 text-fuchsia-300 ring-1 ring-fuchsia-400/30",
+  cyan: "bg-cyan-500/15 text-cyan-300 ring-1 ring-cyan-400/30",
 };
 
 export function Badge({ variant = "default", className, children }: { variant?: keyof typeof styles; className?: string; children: React.ReactNode }) {
@@ -25,7 +26,7 @@ export function StatusBadge({ status }: { status?: string }) {
 export function ActionBadge({ type }: { type: string }) {
   const map: Record<string, [string, keyof typeof styles]> = {
     scale_up: ["เพิ่มงบ", "success"], scale_down: ["ลดงบ", "warning"], pause: ["หยุด", "danger"], resume: ["เปิด", "success"],
-    keep: ["คงเดิม", "muted"], create: ["สร้าง", "purple"], update_budget: ["ปรับงบ", "default"],
+    keep: ["คงเดิม", "muted"], create: ["สร้าง", "purple"], update_budget: ["ปรับงบ", "cyan"], delete: ["ลบ", "danger"], rename: ["เปลี่ยนชื่อ", "muted"],
   };
   const [label, v] = map[type] || [type, "muted"];
   return <Badge variant={v}>{label}</Badge>;

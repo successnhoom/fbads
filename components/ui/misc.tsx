@@ -15,7 +15,7 @@ export function Loading({ text = "กำลังโหลด..." }: { text?: st
 }
 
 export function ErrorBox({ error }: { error: string }) {
-  return <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>;
+  return <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-sm text-rose-200">{error}</div>;
 }
 
 export function Empty({ text }: { text: string }) {

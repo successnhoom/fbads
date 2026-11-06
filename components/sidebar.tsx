@@ -1,12 +1,12 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, Bot, FileText, LayoutDashboard, Megaphone, PenLine, Settings, Sparkles, Users } from "lucide-react";
+import { Bot, FileText, LayoutDashboard, Megaphone, PenLine, Settings, Sparkles, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AccountSwitcher } from "./account-switcher";
 
 const nav = [
-  { href: "/", label: "แดชบอร์ด", icon: LayoutDashboard },
+  { href: "/", label: "แดชบอร์ด AI", icon: LayoutDashboard },
   { href: "/campaigns", label: "แคมเปญ", icon: Megaphone },
   { href: "/planner", label: "AI วางแผนแคมเปญ", icon: Sparkles },
   { href: "/audiences", label: "AI หากลุ่มเป้าหมาย", icon: Users },
@@ -19,12 +19,14 @@ const nav = [
 export function Sidebar() {
   const path = usePathname();
   return (
-    <aside className="hidden w-64 shrink-0 flex-col bg-[hsl(var(--sidebar-background))] text-[hsl(var(--sidebar-foreground))] md:flex">
-      <div className="flex items-center gap-2 px-5 py-5">
-        <BarChart3 className="h-6 w-6 text-blue-400" />
+    <aside className="hidden w-64 shrink-0 flex-col border-r border-white/5 bg-[hsl(var(--sidebar-background))]/80 backdrop-blur-xl md:flex">
+      <div className="flex items-center gap-3 px-5 py-5">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 via-fuchsia-500 to-cyan-400 shadow-lg shadow-violet-500/30">
+          <Sparkles className="h-5 w-5 text-white" />
+        </div>
         <div>
           <div className="font-semibold leading-tight">AI Ads Expert</div>
-          <div className="text-xs text-slate-400">Facebook Ads Autopilot</div>
+          <div className="text-[11px] text-muted-foreground">Facebook Ads Autopilot</div>
         </div>
       </div>
       <div className="px-3 pb-3">
@@ -37,7 +39,10 @@ export function Sidebar() {
             <Link
               key={n.href}
               href={n.href}
-              className={cn("flex items-center gap-3 rounded-md px-3 py-2 text-sm transition", active ? "bg-blue-600 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white")}
+              className={cn(
+                "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition",
+                active ? "bg-gradient-to-r from-violet-600/80 to-fuchsia-600/60 text-white shadow-lg shadow-violet-900/40" : "text-muted-foreground hover:bg-white/5 hover:text-foreground",
+              )}
             >
               <n.icon className="h-4 w-4" />
               {n.label}
@@ -45,7 +50,10 @@ export function Sidebar() {
           );
         })}
       </nav>
-      <div className="px-5 py-4 text-[11px] text-slate-500">ขับเคลื่อนด้วย Claude + Meta Marketing API</div>
+      <div className="m-3 rounded-xl glass p-3 text-[11px] text-muted-foreground">
+        <div className="mb-1 flex items-center gap-2 text-foreground"><span className="pulse-dot inline-block h-2 w-2 rounded-full bg-emerald-400 text-emerald-400" /> AI พร้อมทำงาน</div>
+        ขับเคลื่อนด้วย Claude + Meta Marketing API
+      </div>
     </aside>
   );
 }
