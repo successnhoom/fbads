@@ -3,6 +3,9 @@ import { SCHEMA_SQL } from "./schema-sql";
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient; prismaReady?: Promise<void> };
 
+// ค่าเริ่มต้นสำหรับ serverless: ถ้าไม่ได้ตั้ง DATABASE_URL ใช้ SQLite ใน /tmp (ข้อมูลหายเมื่อ instance ใหม่)
+if (!process.env.DATABASE_URL) process.env.DATABASE_URL = process.env.VERCEL ? "file:/tmp/app.db" : "file:./dev.db";
+
 function create() {
   return new PrismaClient({ log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"] });
 }

@@ -2,7 +2,8 @@ import crypto from "crypto";
 
 // เข้ารหัส access token ก่อนเก็บลงฐานข้อมูล (AES-256-GCM)
 function key() {
-  const secret = process.env.APP_SECRET_KEY;
+  // โหมดสาธิตบน Vercel ใช้คีย์ชั่วคราวได้ถ้าไม่ได้ตั้งค่า – ใช้งานจริงต้องตั้ง APP_SECRET_KEY เสมอ
+  const secret = process.env.APP_SECRET_KEY || (process.env.VERCEL && process.env.DEMO_MODE !== "0" ? "demo-only-key-set-APP_SECRET_KEY-for-real-use" : undefined);
   if (!secret || secret.length < 16) {
     throw new Error("APP_SECRET_KEY ต้องตั้งค่าและยาวอย่างน้อย 16 ตัวอักษร");
   }

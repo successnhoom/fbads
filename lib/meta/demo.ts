@@ -168,4 +168,6 @@ export class DemoMetaClient extends MetaClient {
   override async createLookalike() { return { id: `la_demo_${++seq}` }; }
 }
 
-export const isDemoMode = () => process.env.DEMO_MODE === "1" || process.env.DEMO_MODE === "true";
+/** เปิดโหมดสาธิตเมื่อ DEMO_MODE=1 หรือเมื่อรันบน Vercel แล้วยังไม่ได้ตั้ง DEMO_MODE (ตั้ง DEMO_MODE=0 เพื่อปิด) */
+export const isDemoMode = () =>
+  process.env.DEMO_MODE === "1" || process.env.DEMO_MODE === "true" || (process.env.DEMO_MODE === undefined && process.env.VERCEL === "1");
