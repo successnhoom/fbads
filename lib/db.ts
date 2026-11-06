@@ -1,11 +1,39 @@
 import { PrismaClient } from "@prisma/client";
+import { SCHEMA_SQL } from "./schema-sql";
 
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient; prismaReady?: Promise<void> };
 
-export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"],
-  });
+function create() {
+  return new PrismaClient({ log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"] });
+}
 
+export const prisma = globalForPrisma.prisma ?? create();
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+
+/**
+ * บน serverless (Vercel) ที่ใช้ SQLite ใน /tmp ไฟล์จะว่างเปล่าตอน cold start
+ * ฟังก์ชันนี้สร้างตารางให้อัตโนมัติถ้ายังไม่มี (รันครั้งเดียวต่อ process)
+ */
+export function ensureSchema(): Promise<void> {
+  if (!globalForPrisma.prismaReady) {
+    globalForPrisma.prismaReady = (async () => {
+      if (!(process.env.DATABASE_URL || "").startsWith("file:")) return;
+      try {
+        const rows = await prisma.$queryRawUnsafe<Array<{ name: string }>>("SELECT name FROM sqlite_master WHERE type='table' AND name='AdAccount'");
+        if (rows.length) return;
+        const statements = SCHEMA_SQL.split("\n")
+          .filter((line) => !line.trim().startsWith("--"))
+          .join("\n")
+          .split(";")
+          .map((x) => x.trim())
+          .filter((x) => /^CREATE/i.test(x));
+        for (const stmt of statements) await prisma.$executeRawUnsafe(stmt);
+      } catch (e) {
+        console.error("[db] ensureSchema failed", e);
+        globalForPrisma.prismaReady = undefined;
+        throw e;
+      }
+    })();
+  }
+  return globalForPrisma.prismaReady;
+}

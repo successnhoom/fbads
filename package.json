@@ -9,6 +9,7 @@
     "lint": "next lint",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
+    "db:sql": "node scripts/gen-schema-sql.mjs",
     "postinstall": "prisma generate",
     "test": "tsx --test tests/*.test.ts"
   },

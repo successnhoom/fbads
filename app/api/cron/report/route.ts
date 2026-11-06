@@ -1,5 +1,5 @@
 import { fail, ok, requireCronAuth } from "@/lib/api";
-import { prisma } from "@/lib/db";
+import { ensureSchema, prisma } from "@/lib/db";
 import { buildReport } from "@/lib/ai/build-report";
 
 export const maxDuration = 300;
@@ -8,6 +8,7 @@ export const maxDuration = 300;
 export async function GET(req: Request) {
   try {
     requireCronAuth(req);
+    await ensureSchema();
     const type = (new URL(req.url).searchParams.get("type") as "daily" | "weekly") || "daily";
     const accounts = await prisma.adAccount.findMany();
     const results = [];

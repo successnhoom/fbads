@@ -1,14 +1,31 @@
-import { prisma } from "@/lib/db";
+import { ensureSchema, prisma } from "@/lib/db";
 import { decrypt, encrypt } from "@/lib/crypto";
 import { MetaClient } from "@/lib/meta/client";
+import { DEMO_ACCOUNT_ID, DemoMetaClient, isDemoMode } from "@/lib/meta/demo";
 import type { AdAccount, AutomationSettings } from "@prisma/client";
 
+/** โหมดสาธิต: สร้างบัญชีจำลองให้อัตโนมัติถ้ายังไม่มี */
+async function ensureDemoAccount() {
+  if (!isDemoMode()) return;
+  const existing = await prisma.adAccount.findUnique({ where: { id: DEMO_ACCOUNT_ID } });
+  if (existing) return;
+  const anyActive = await prisma.adAccount.findFirst({ where: { isActive: true } });
+  await prisma.adAccount.create({
+    data: { id: DEMO_ACCOUNT_ID, name: "ร้านสาธิต (Demo)", currency: "THB", timezone: "Asia/Bangkok", accessTokenEnc: encrypt("demo-token"), businessName: "Demo Business", isActive: !anyActive, pageId: "page_demo", pixelId: "px_demo" },
+  });
+  await prisma.automationSettings.upsert({ where: { accountId: DEMO_ACCOUNT_ID }, update: {}, create: { accountId: DEMO_ACCOUNT_ID, targetCpa: 80, dailyBudgetCap: 2000 } });
+}
+
 export async function listAccounts() {
+  await ensureSchema();
+  await ensureDemoAccount();
   return prisma.adAccount.findMany({ orderBy: { createdAt: "asc" }, include: { settings: true } });
 }
 
 /** บัญชีที่เลือกใช้งานอยู่ (isActive) หรือบัญชีแรก */
 export async function getActiveAccount(accountId?: string | null) {
+  await ensureSchema();
+  await ensureDemoAccount();
   if (accountId) {
     const a = await prisma.adAccount.findUnique({ where: { id: accountId }, include: { settings: true } });
     if (a) return a;
@@ -19,6 +36,7 @@ export async function getActiveAccount(accountId?: string | null) {
 }
 
 export function clientFor(account: AdAccount) {
+  if (account.id === DEMO_ACCOUNT_ID) return new DemoMetaClient();
   return new MetaClient(decrypt(account.accessTokenEnc));
 }
 
@@ -34,6 +52,7 @@ export async function ensureSettings(accountId: string): Promise<AutomationSetti
 
 /** บันทึก token + ดึงบัญชีโฆษณาทั้งหมดที่ token เข้าถึงได้ */
 export async function connectWithToken(token: string, expiresInSec?: number) {
+  await ensureSchema();
   const client = new MetaClient(token);
   const accounts = await client.adAccounts();
   if (!accounts.length) throw new Error("token นี้ไม่มีสิทธิ์เข้าถึงบัญชีโฆษณาใดเลย");

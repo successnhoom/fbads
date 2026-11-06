@@ -1,11 +1,13 @@
 import { handler, ok } from "@/lib/api";
 import { listAccounts } from "@/lib/accounts";
 import { prisma } from "@/lib/db";
+import { isDemoMode } from "@/lib/meta/demo";
 
 export const GET = handler(async () => {
   const accounts = await listAccounts();
   return ok(
     accounts.map((a) => ({
+      demo: isDemoMode() && a.id === "act_demo",
       id: a.id, name: a.name, currency: a.currency, timezone: a.timezone, isActive: a.isActive, pageId: a.pageId, pixelId: a.pixelId,
       businessName: a.businessName, tokenExpiresAt: a.tokenExpiresAt, automationEnabled: a.settings?.enabled ?? false,
     })),
