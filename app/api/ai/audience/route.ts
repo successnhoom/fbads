@@ -3,6 +3,9 @@ import { requireAccount } from "@/lib/accounts";
 import { AudienceBriefSchema, generateAudiencePlan, resolveSegments } from "@/lib/ai/audience";
 import { prisma } from "@/lib/db";
 
+// AI ใช้เวลาคิด 1-3 นาที – ขยายเวลาทำงานของฟังก์ชันบน serverless
+export const maxDuration = 300;
+
 export const POST = handler(async (req) => {
   const body = await req.json();
   const brief = AudienceBriefSchema.parse(body);

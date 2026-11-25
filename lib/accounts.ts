@@ -2,6 +2,7 @@ import { ensureSchema, prisma } from "@/lib/db";
 import { decrypt, encrypt } from "@/lib/crypto";
 import { MetaClient } from "@/lib/meta/client";
 import { DEMO_ACCOUNT_ID, DemoMetaClient, isDemoMode } from "@/lib/meta/demo";
+import { realAccountBlocker } from "@/lib/env";
 import type { AdAccount, AutomationSettings } from "@prisma/client";
 
 /** โหมดสาธิต: สร้างบัญชีจำลองให้อัตโนมัติถ้ายังไม่มี */
@@ -16,16 +17,36 @@ async function ensureDemoAccount() {
   await prisma.automationSettings.upsert({ where: { accountId: DEMO_ACCOUNT_ID }, update: {}, create: { accountId: DEMO_ACCOUNT_ID, targetCpa: 80, dailyBudgetCap: 2000 } });
 }
 
-export async function listAccounts() {
+/** ถ้าตั้ง META_ACCESS_TOKEN ไว้แต่ยังไม่มีบัญชีจริง → เชื่อมต่อให้อัตโนมัติ (ครั้งเดียวต่อ process) */
+const g = globalThis as unknown as { envTokenTried?: boolean };
+async function ensureEnvTokenAccounts() {
+  const token = process.env.META_ACCESS_TOKEN;
+  if (!token || g.envTokenTried) return;
+  g.envTokenTried = true;
+  const real = await prisma.adAccount.count({ where: { id: { not: DEMO_ACCOUNT_ID } } });
+  if (real > 0) return;
+  try {
+    await connectWithToken(token);
+  } catch (e) {
+    console.error("[accounts] auto-connect with META_ACCESS_TOKEN failed:", (e as Error).message);
+    g.envTokenTried = false; // ลองใหม่รอบหน้า
+  }
+}
+
+async function prepare() {
   await ensureSchema();
   await ensureDemoAccount();
+  await ensureEnvTokenAccounts();
+}
+
+export async function listAccounts() {
+  await prepare();
   return prisma.adAccount.findMany({ orderBy: { createdAt: "asc" }, include: { settings: true } });
 }
 
 /** บัญชีที่เลือกใช้งานอยู่ (isActive) หรือบัญชีแรก */
 export async function getActiveAccount(accountId?: string | null) {
-  await ensureSchema();
-  await ensureDemoAccount();
+  await prepare();
   if (accountId) {
     const a = await prisma.adAccount.findUnique({ where: { id: accountId }, include: { settings: true } });
     if (a) return a;
@@ -52,6 +73,8 @@ export async function ensureSettings(accountId: string): Promise<AutomationSetti
 
 /** บันทึก token + ดึงบัญชีโฆษณาทั้งหมดที่ token เข้าถึงได้ */
 export async function connectWithToken(token: string, expiresInSec?: number) {
+  const blocker = realAccountBlocker();
+  if (blocker) throw new Error(blocker);
   await ensureSchema();
   const client = new MetaClient(token);
   const accounts = await client.adAccounts();

@@ -110,16 +110,33 @@ prisma/schema.prisma    ฐานข้อมูล (SQLite ค่าเริ�
 tests/                  unit tests: npm test
 ```
 
-## Deploy
+## Deploy ขึ้นเว็บจริง (Vercel)
 
-1. ใช้ PostgreSQL บน production (Neon / Supabase ฟรี): แก้ `provider = "postgresql"` ใน `prisma/schema.prisma` แล้วตั้ง `DATABASE_URL`
-2. ตั้ง env ทั้งหมดบน Vercel / Railway / Render
-3. `npm run build` จะรัน `prisma generate` ให้อัตโนมัติ, รัน `npx prisma db push` ครั้งแรก
-4. เพิ่ม `APP_URL/api/auth/facebook/callback` ใน Facebook Login → Valid OAuth Redirect URIs
+1. Import repo นี้ที่ https://vercel.com/new แล้วตั้ง Production Branch ให้ตรงกับ branch ที่มีโค้ด
+2. ครั้งแรกไม่ต้องตั้งค่าอะไร เว็บจะเปิดเป็น **โหมดสาธิต** (ข้อมูลจำลอง) ให้ดูหน้าตาก่อน
+3. เปิดใช้งานจริง: หน้า **ตั้งค่า** ในเว็บมี "เช็กลิสต์เปิดใช้งานจริง" บอกว่าเหลืออะไร ตั้งค่าทั้งหมดที่ Vercel → Settings → Environment Variables แล้ว Redeploy
+
+| ตัวแปร | ใส่อะไร | จำเป็น |
+|---|---|---|
+| `APP_PASSWORD` | รหัสเข้าเว็บ ตั้งเอง | ใช่ – ไม่ตั้งจะเชื่อมบัญชีจริงไม่ได้ |
+| `APP_SECRET_KEY` | ตัวอักษรสุ่ม 32+ ตัว | ใช่ |
+| `DATABASE_URL` | มาจาก Vercel → Storage → Neon (Postgres) → Connect | ใช่ – ไม่งั้นข้อมูลหายทุกครั้งที่ redeploy |
+| `META_ACCESS_TOKEN` | System User token ของ Meta | ใช่ (หรือวาง token ในหน้าตั้งค่า) |
+| `ANTHROPIC_API_KEY` | จาก platform.claude.com | สำหรับฟีเจอร์ AI |
+| `CRON_SECRET` | ตัวอักษรสุ่ม | สำหรับออโต้รายวัน |
+
+เมื่อ `DATABASE_URL` เป็น `postgres://` ขั้นตอน build จะใช้ `prisma/schema.postgres.prisma` และสร้างตารางให้เอง ถ้าแก้ `prisma/schema.prisma` ให้แก้ไฟล์ postgres ให้ตรงกันและรัน `npm run db:sql`
+
+### การป้องกันที่มีในตัว
+
+- ตั้ง `APP_PASSWORD` แล้วทุกหน้าและทุก API ต้องล็อกอิน (ยกเว้น `/api/cron/*` ที่ใช้ `CRON_SECRET`)
+- เว็บบน Vercel ที่ปิดโหมดสาธิตแต่ไม่มีรหัสผ่าน จะถูกล็อกทั้งเว็บ
+- เชื่อมบัญชีจริงบน Vercel ไม่ได้จนกว่าจะตั้ง `APP_PASSWORD` และ `APP_SECRET_KEY`
+- ใส่รหัสผิดเกิน 5 ครั้งจะถูกหน่วงเวลา
 
 ## หมายเหตุด้านความปลอดภัย
 
-- แอปนี้ไม่มีระบบล็อกอินผู้ใช้ – ออกแบบให้ใช้คนเดียว/ทีมเดียว ถ้าจะเปิด public ควรใส่ auth (เช่น Vercel Password Protection, Cloudflare Access, หรือ NextAuth) หน้าแอป
+- ระบบล็อกอินเป็นรหัสผ่านเดียวร่วมกัน (`APP_PASSWORD`) ออกแบบให้ใช้คนเดียว/ทีมเดียว ยังไม่มีบัญชีผู้ใช้แยกรายคนหรือสิทธิ์ต่างระดับ
 - Access token ถูกเข้ารหัส AES-256-GCM ด้วย `APP_SECRET_KEY` ก่อนเก็บ
 - การสร้างแคมเปญจาก AI จะเริ่มในสถานะ **PAUSED** เสมอ ยกเว้นกดเลือก "สร้างและเปิดทันที"
 - โหมดออโต้ "ทำทันที" ควรเปิดหลังจากทดลองโหมด "รออนุมัติ" จนมั่นใจใน guardrails แล้ว

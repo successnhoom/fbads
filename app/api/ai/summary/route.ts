@@ -6,6 +6,9 @@ import { askJSON } from "@/lib/ai/claude";
 import { compactEntity } from "@/lib/meta/insights";
 import { buildBrief } from "@/lib/summary";
 
+// AI ใช้เวลาคิด 1-3 นาที – ขยายเวลาทำงานของฟังก์ชันบน serverless
+export const maxDuration = 300;
+
 const Schema = z.object({
   headline: z.string().describe("สรุป 1 ประโยค ภาษาง่าย ๆ สำหรับเจ้าของร้าน"),
   explanation: z.string().describe("อธิบาย 3-5 ประโยค ว่าเกิดอะไรขึ้นกับโฆษณา เพราะอะไร"),

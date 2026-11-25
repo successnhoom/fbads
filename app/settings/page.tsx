@@ -9,6 +9,7 @@ import { Field, Input, Select } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/misc";
 import { api, useFetch, type AccountInfo } from "@/lib/client";
+import { SetupChecklist } from "@/components/setup-status";
 
 function SettingsInner() {
   const sp = useSearchParams();
@@ -65,6 +66,8 @@ function SettingsInner() {
   return (
     <div className="max-w-4xl">
       <PageHeader title="ตั้งค่า / เชื่อมต่อบัญชี" description="เชื่อมต่อบัญชีโฆษณา Facebook จริง เลือกเพจและพิกเซลสำหรับสร้างแคมเปญ" />
+
+      <div className="mb-4"><SetupChecklist /></div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>

@@ -3,6 +3,9 @@ import { requireAccount } from "@/lib/accounts";
 import { CampaignPlanSchema, launchPlan, PlanBriefSchema } from "@/lib/ai/planner";
 import { prisma } from "@/lib/db";
 
+// AI ใช้เวลาคิด 1-3 นาที – ขยายเวลาทำงานของฟังก์ชันบน serverless
+export const maxDuration = 300;
+
 export const POST = handler<{ params: Promise<{ id: string }> }>(async (req, ctx) => {
   const { id } = await ctx.params;
   const body = (await req.json().catch(() => ({}))) as { status?: "ACTIVE" | "PAUSED"; plan?: unknown; pageId?: string; pixelId?: string };

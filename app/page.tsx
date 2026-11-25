@@ -8,6 +8,7 @@ import { Select } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Empty, ErrorBox, Loading } from "@/components/ui/misc";
 import { PendingActions } from "@/components/pending-actions";
+import { SetupBanner } from "@/components/setup-status";
 import { AgeGenderChart, AiBrief, Collapsible, Donut, EntityRow, KpiRow, QuickCreate, TrendChart } from "@/components/dashboard";
 import { api, useFetch } from "@/lib/client";
 import type { AccountSnapshot } from "@/lib/meta/data";
@@ -90,6 +91,8 @@ export default function Dashboard() {
         <Button variant="outline" size="sm" onClick={reload}><RefreshCw /> รีเฟรช</Button>
         <Button size="sm" className="bg-gradient-to-r from-violet-600 to-cyan-500 hover:opacity-90" onClick={() => setShowCreate(true)}><Plus /> สร้างแคมเปญ</Button>
       </Header>
+
+      <SetupBanner />
 
       <AiBrief brief={brief} currency={cur} onAction={onAction} onDeep={runDeep} deep={deep} deepLoading={deepLoading} />
 

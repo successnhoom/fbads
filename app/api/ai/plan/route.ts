@@ -3,6 +3,9 @@ import { requireAccount } from "@/lib/accounts";
 import { PlanBriefSchema, generateCampaignPlan } from "@/lib/ai/planner";
 import { prisma } from "@/lib/db";
 
+// AI ใช้เวลาคิด 1-3 นาที – ขยายเวลาทำงานของฟังก์ชันบน serverless
+export const maxDuration = 300;
+
 export const GET = handler(async (req) => {
   const { account } = await requireAccount(new URL(req.url).searchParams.get("accountId"));
   const plans = await prisma.campaignPlan.findMany({ where: { accountId: account.id }, orderBy: { createdAt: "desc" }, take: 20 });
